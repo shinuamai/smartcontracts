@@ -45,7 +45,7 @@ contract('StakingContract', ([peter, owner]) => {
   })
   it('deposit some token', async () => {
     await this.STAKING.deposiToken(15, {from: peter});
-    assert.equal(await this.TOKEN.balanceOf(peter), 1);
+    assert.equal(await this.TOKEN.balanceOf(this.STAKING.address), 15);
   })
   it('get rewards for the deposit', async () => {
     await this.STAKING.getRewards({from: peter});
