@@ -1,7 +1,7 @@
 const TOKEN_CONTRACT = artifacts.require("Shinuamai");
 const NFT_CONTRACT = artifacts.require("Shinuamai2");
 const STAKING_CONTRACT = artifacts.require("Staking");
-const { expectEvent, expectRevert, time, BN } = require('@openzeppelin/test-helpers');
+const { expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
 const { assert } = require('chai');
 
@@ -41,17 +41,19 @@ contract('StakingContract', ([peter, owner]) => {
     await this.TOKEN.mint(peter);
   })
   it("check staking user is set correctly", async () => {
-    await expectRevert(this.TOKEN.setStakingContract(this.STAKING.address, {from: peter}), "Ownable: caller is not the owner");
+    await expectRevert(this.TOKEN.setStakingContract(this.STAKING.address, { from: peter }), "Ownable: caller is not the owner");
   })
   it('deposit some token', async () => {
-    await this.STAKING.deposiToken(15, {from: peter});
-    assert.equal(await this.TOKEN.balanceOf(this.STAKING.address), 15);
+    await this.TOKEN.approve(this.STAKING.address, 10);
+    await this.STAKING.deposiToken(10, { from: peter });
+    assert.equal(await this.TOKEN.balanceOf(this.STAKING.address), 10);
   })
   it('get rewards for the deposit', async () => {
-    await this.STAKING.getRewards({from: peter});
-    
+    await this.TOKEN.setStakingContract(this.STAKING.address, { from: owner });
+    await this.STAKING.getRewards({ from: peter });
   })
   it('retrieve tokens', async () => {
-    await this.STAKING.retrieve({from: peter});
+    await this.STAKING.retrieve({ from: peter });
+    assert.equal(await this.TOKEN.balanceOf(this.STAKING.address), 0);
   })
 });
